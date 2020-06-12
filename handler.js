@@ -49,4 +49,32 @@ app.put("/lists/:listId", function (req, res) {
   res.json({ message: `You issued a put request for ${req.body.title} list with ID ${req.params.listId} ` });
 });
 
+//tasks routes
+app.delete("/tasks/:taskId", function (req, res) {
+  const taskId = req.params.taskId;
+
+  if (isNaN(parseInt(taskId, 10))) {
+    res.status(404);
+    res.json({
+      message: taskId + " is not a valid Task ID",
+    });
+  }
+
+  res.status(200);
+  res.json({
+    message: "You issued a delete request for Task ID: " + taskId,
+  });
+});
+
+app.post("/tasks", function (req, res) {
+  res.status(201);
+  res.json({ message: `Received a request to add task ${req.body.text} on date ${req.body.dateCreated}` });
+});
+
+app.put("/tasks/:taskId", function (req, res) {
+  res.status(200);
+  res.json({ message: `You issued a put request for ${req.body.text} with Task ID ${req.params.taskId} ` });
+});
+
 module.exports.lists = serverless(app);
+module.exports.tasks = serverless(app);

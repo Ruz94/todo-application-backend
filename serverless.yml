@@ -25,3 +25,19 @@ functions:
           path: lists/{listId}
           method: put
           cors: true
+
+  tasks:
+    handler: handler.tasks
+    events:
+      - http:
+          path: tasks/{taskId}
+          method: delete
+          cors: true
+      - http:
+          path: tasks
+          method: post
+          cors: true
+      - http:
+          path: tasks/{taskId}
+          method: put
+          cors: true
