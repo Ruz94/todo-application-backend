@@ -8,6 +8,10 @@ provider:
 functions:
   lists:
     handler: handler.lists
+    environment:
+      DB_HOST: ${opt:DB_HOST}
+      DB_USER: ${opt:DB_USER}
+      DB_PASSWORD: ${opt:DB_PASSWORD}
     events:
       - http:
           path: lists
@@ -28,6 +32,10 @@ functions:
 
   tasks:
     handler: handler.tasks
+    environment:
+      DB_HOST: ${opt:DB_HOST}
+      DB_USER: ${opt:DB_USER}
+      DB_PASSWORD: ${opt:DB_PASSWORD}
     events:
       - http:
           path: tasks/{taskId}
