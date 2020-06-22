@@ -174,7 +174,6 @@ app.post("/tasks", function (req, res) {
 
 app.put("/tasks/:taskId", function (req, res) {
   const query = "UPDATE Tasks SET text = ? WHERE (taskId = ?)";
-  const querySelect = "SELECT * FROM Tasks where taskId = ?";
 
   connection.query(query, [req.body.text, req.params.taskId], function (error) {
     if (error) {
