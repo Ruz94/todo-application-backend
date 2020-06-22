@@ -18,17 +18,32 @@ const connection = mysql.createConnection({
 
 //lists routes
 app.get("/lists", function (req, res) {
-  const getQuery = "SELECT * FROM Lists;";
+  const getListQuery = "SELECT * FROM Lists;";
+  const getTasksQuery = "SELECT * FROM Tasks;";
 
-  connection.query(getQuery, function (error, data) {
+  connection.query(getListQuery, function (error, listData) {
     if (error) {
       console.log("Error fetching lists", error);
       res.status(500).json({
         error: error,
       });
     } else {
-      res.status(200).json({
-        lists: data,
+      connection.query(getTasksQuery, function (error, taskData) {
+        if (error) {
+          console.log("Error fetching tasks", error);
+          res.status(500).json({
+            error: error,
+          });
+        } else {
+          const data = listData.map((list) => {
+            const tasks = taskData.filter((task) => task.listId === list.listId);
+            list.tasks = tasks;
+            return list;
+          });
+          res.status(200).json({
+            lists: data,
+          });
+        }
       });
     }
   });
@@ -103,7 +118,7 @@ app.put("/lists/:listId", function (req, res) {
     } else {
       res.status(200).json({
         listId: req.params.listId,
-        message: "You successfully updated List with ID: " + req.params.listId,
+        message: `You successfully updated List with ID: "${req.params.listId}" to title: "${req.body.title}"`,
       });
     }
   });
@@ -130,10 +145,10 @@ app.delete("/tasks/:taskId", function (req, res) {
 });
 
 app.post("/tasks", function (req, res) {
-  const taskAdd = "INSERT INTO Tasks (text, dateCreated) VALUES (?, ?);";
+  const taskAdd = "INSERT INTO Tasks (text, dateCreated, listId) VALUES (?, ?, ?);";
   const addedTask = "SELECT * FROM Tasks where taskId = ?";
 
-  connection.query(taskAdd, [req.body.text, req.body.dateCreated], function (error, data) {
+  connection.query(taskAdd, [req.body.text, req.body.dateCreated, req.body.listId], function (error, data) {
     if (error) {
       console.log("Error adding a task", error);
       res.status(500).json({
@@ -148,7 +163,7 @@ app.post("/tasks", function (req, res) {
           });
         } else {
           res.status(200).json({
-            tasks: data,
+            task: data[0],
             message: `You successfully added task ${req.body.text} on date ${req.body.dateCreated}`,
           });
         }
@@ -159,6 +174,7 @@ app.post("/tasks", function (req, res) {
 
 app.put("/tasks/:taskId", function (req, res) {
   const query = "UPDATE Tasks SET text = ? WHERE (taskId = ?)";
+  const querySelect = "SELECT * FROM Tasks where taskId = ?";
 
   connection.query(query, [req.body.text, req.params.taskId], function (error) {
     if (error) {
