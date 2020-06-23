@@ -80,10 +80,10 @@ app.delete("/lists/:listId", function (req, res) {
 });
 
 app.post("/lists", function (req, res) {
-  const query = "INSERT INTO Lists (title, dateCreated) VALUES (?, ?);";
+  const query = "INSERT INTO Lists (title) VALUES (?);";
   const querySelect = "SELECT * FROM Lists where listId = ?";
 
-  connection.query(query, [req.body.title, req.body.dateCreated], function (error, data) {
+  connection.query(query, [req.body.title], function (error, data) {
     if (error) {
       console.log("Error adding a list", error);
       res.status(500).json({
@@ -145,10 +145,10 @@ app.delete("/tasks/:taskId", function (req, res) {
 });
 
 app.post("/tasks", function (req, res) {
-  const taskAdd = "INSERT INTO Tasks (text, dateCreated, listId) VALUES (?, ?, ?);";
+  const taskAdd = "INSERT INTO Tasks (text, listId) VALUES (?, ?);";
   const addedTask = "SELECT * FROM Tasks where taskId = ?";
 
-  connection.query(taskAdd, [req.body.text, req.body.dateCreated, req.body.listId], function (error, data) {
+  connection.query(taskAdd, [req.body.text, req.body.listId], function (error, data) {
     if (error) {
       console.log("Error adding a task", error);
       res.status(500).json({
@@ -164,7 +164,7 @@ app.post("/tasks", function (req, res) {
         } else {
           res.status(200).json({
             task: data[0],
-            message: `You successfully added task ${req.body.text} on date ${req.body.dateCreated}`,
+            message: `You successfully added task ${req.body.text}`,
           });
         }
       });
